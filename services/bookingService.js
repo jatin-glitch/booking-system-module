@@ -10,33 +10,30 @@ class BookingService {
 
     try {
       const slot = await Slot.findById(slotId).session(session);
-      
+
       if (!slot) {
-        await session.abortTransaction();
         throw new Error('Slot not found');
       }
 
       if (slot.isBooked) {
-        await session.abortTransaction();
         throw new Error('Slot already booked');
       }
 
       const updatedSlot = await Slot.findOneAndUpdate(
-        { 
-          _id: slotId, 
-          isBooked: false 
+        {
+          _id: slotId,
+          isBooked: false
         },
-        { 
-          isBooked: true 
+        {
+          isBooked: true
         },
-        { 
-          new: true, 
-          session: session 
+        {
+          new: true,
+          session: session
         }
       );
 
       if (!updatedSlot) {
-        await session.abortTransaction();
         throw new Error('Slot already booked or not found');
       }
 
@@ -49,7 +46,7 @@ class BookingService {
 
       await session.commitTransaction();
       logger.info(`Slot booked: ${slotId} by user: ${userId}`);
-      
+
       return booking;
     } catch (error) {
       await session.abortTransaction();
@@ -63,7 +60,7 @@ class BookingService {
   async getAllBookings(page = 1, limit = 10) {
     try {
       const skip = (page - 1) * limit;
-      
+
       const bookings = await Booking.find()
         .populate('slotId', 'date time isBooked')
         .sort({ createdAt: -1 })
@@ -72,9 +69,9 @@ class BookingService {
         .lean();
 
       const total = await Booking.countDocuments();
-      
+
       logger.info(`Fetched ${bookings.length} bookings`);
-      
+
       return {
         bookings,
         pagination: {
@@ -95,11 +92,11 @@ class BookingService {
       const booking = await Booking.findById(bookingId)
         .populate('slotId', 'date time isBooked')
         .lean();
-      
+
       if (!booking) {
         throw new Error('Booking not found');
       }
-      
+
       return booking;
     } catch (error) {
       logger.error('Error fetching booking:', error);
@@ -113,7 +110,7 @@ class BookingService {
         .populate('slotId', 'date time isBooked')
         .sort({ createdAt: -1 })
         .lean();
-      
+
       logger.info(`Fetched ${bookings.length} bookings for user: ${userId}`);
       return bookings;
     } catch (error) {

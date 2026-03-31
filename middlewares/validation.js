@@ -1,10 +1,9 @@
 const Joi = require('joi');
 
 const slotValidationSchema = Joi.object({
-  date: Joi.date().iso().min('now').required().messages({
+  date: Joi.date().iso().required().messages({
     'date.base': 'Date must be a valid date',
     'date.format': 'Date must be in ISO format',
-    'date.min': 'Date cannot be in the past',
     'any.required': 'Date is required'
   }),
   time: Joi.string().pattern(/^([01]?[0-9]|2[0-3]):[0-5][0-9]$/).required().messages({

@@ -5,8 +5,10 @@ const slotSchema = new mongoose.Schema({
     type: Date,
     required: [true, 'Date is required'],
     validate: {
-      validator: function(value) {
-        return value > new Date();
+      validator: function (value) {
+        const today = new Date();
+        today.setUTCHours(0, 0, 0, 0);
+        return value >= today;
       },
       message: 'Date cannot be in the past'
     }
@@ -15,7 +17,7 @@ const slotSchema = new mongoose.Schema({
     type: String,
     required: [true, 'Time is required'],
     validate: {
-      validator: function(value) {
+      validator: function (value) {
         const timeRegex = /^([01]?[0-9]|2[0-3]):[0-5][0-9]$/;
         return timeRegex.test(value);
       },
